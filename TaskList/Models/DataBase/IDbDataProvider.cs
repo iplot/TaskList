@@ -8,12 +8,12 @@ namespace TaskList.Models.DataBase
 {
     public interface IDbDataProvider
     {
-        DataBaseResult GetData();
+        Task<DataBaseResult> GetData();
 
-        DataBaseResult UpdateData(int targetId, IParameters param);
+        Task<DataBaseResult> UpdateData(int targetId, IParameters param);
 
-        DataBaseResult DeleteData(int targetId);
+        Task<DataBaseResult> DeleteData(int targetId);
 
-        DataBaseResult AddData(object targetObject);
+        Task<DataBaseResult> AddData(object targetObject);
     }
 }

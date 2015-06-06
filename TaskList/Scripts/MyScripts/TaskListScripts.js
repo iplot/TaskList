@@ -48,7 +48,7 @@ function onSaveClick() {
         contentType: 'application/json',
         dataType: 'json',
         success: function(result) {
-            alert('Ok');
+            alert('Task list saved');
         }
     });
 }

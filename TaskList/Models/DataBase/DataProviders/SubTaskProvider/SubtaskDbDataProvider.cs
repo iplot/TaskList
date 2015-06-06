@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using TaskList.Models.DataBase.Entities;
 
@@ -8,13 +10,13 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
 {
     public class SubtaskDbDataProvider : IDbDataProvider
     {
-        public DataBaseResult GetData()
+        public async Task<DataBaseResult> GetData()
         {
             try
             {
                 using (TaskListContext session = new TaskListContext())
                 {
-                    var subtasks = session.SubTasks.ToList();
+                    var subtasks = await session.SubTasks.ToListAsync();
 
                     return new DataBaseResult {Errors = "", Success = subtasks};
                 }
@@ -25,7 +27,7 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
             }
         }
 
-        public DataBaseResult UpdateData(int targetId, IParameters param)
+        public async Task<DataBaseResult> UpdateData(int targetId, IParameters param)
         {
             try
             {
@@ -37,7 +39,7 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
 
                 using (TaskListContext session = new TaskListContext())
                 {
-                    var subtask = session.SubTasks.First(s => s.SubTaskId == targetId);
+                    var subtask = await session.SubTasks.FirstAsync(s => s.SubTaskId == targetId);
 
                     if (!subtaskParam.UpdateFinishedOnly)
                     {
@@ -49,7 +51,7 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
                         subtask.IsFinished = subtaskParam.IsFinished;
                     }
 
-                    session.SaveChanges();
+                    await session.SaveChangesAsync();
 
                     return new DataBaseResult {Errors = "", Success = subtask};
                 }
@@ -60,16 +62,16 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
             }
         }
 
-        public DataBaseResult DeleteData(int targetId)
+        public async Task<DataBaseResult> DeleteData(int targetId)
         {
             try
             {
                 using (TaskListContext session = new TaskListContext())
                 {
-                    var subtask = session.SubTasks.First(s => s.SubTaskId == targetId);
+                    var subtask = await session.SubTasks.FirstAsync(s => s.SubTaskId == targetId);
                     session.SubTasks.Remove(subtask);
 
-                    session.SaveChanges();
+                    await session.SaveChangesAsync();
 
                     return new DataBaseResult {Errors = "", Success = new object()};
                 }
@@ -80,7 +82,7 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
             }
         }
 
-        public DataBaseResult AddData(object targetObject)
+        public async Task<DataBaseResult> AddData(object targetObject)
         {
             try
             {
@@ -94,7 +96,7 @@ namespace TaskList.Models.DataBase.DataProviders.SubTaskProvider
                 using (TaskListContext session = new TaskListContext())
                 {
                     session.SubTasks.Add(subtask);
-                    session.SaveChanges();
+                    await session.SaveChangesAsync();
 
                     return new DataBaseResult {Errors = "", Success = subtask};
                 }

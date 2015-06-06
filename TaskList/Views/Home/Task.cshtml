@@ -1,6 +1,6 @@
 ﻿@model TaskList.Models.DataBase.Entities.Task
 <li>
-    <input type="checkbox" @(Model.IsFinished ? "checked" : "") value="@Model.TaskId" data-type="0" />
+    <input type="checkbox" @(Model.IsFinished ? "checked" : "") value="@Model.TaskId" data-type="0"/>
     @Model.Text (@Model.Date.ToShortDateString())
     @using (Ajax.BeginForm("AddSubTask", new { TaskId = Model.TaskId }, new AjaxOptions { OnSuccess = "addSubTask" }))
     {

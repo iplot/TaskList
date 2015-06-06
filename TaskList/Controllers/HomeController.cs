@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using TaskList.Infrastructure;
@@ -11,16 +12,17 @@ using TaskList.Models.DataBase.DataProviders;
 using TaskList.Models.DataBase.DataProviders.SubTaskProvider;
 using TaskList.Models.DataBase.DataProviders.TaskProvider;
 using TaskList.Models.DataBase.Entities;
+using Task = TaskList.Models.DataBase.Entities.Task;
 
 namespace TaskList.Controllers
 {
     public class HomeController : Controller
     {
         // GET: Home
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             IDbDataProvider dataProvider = new CategoryDbDataProvider();
-            DataBaseResult result = dataProvider.GetData();
+            DataBaseResult result = await dataProvider.GetData();
 
 
             if (result.Success != null)
@@ -35,10 +37,10 @@ namespace TaskList.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddCategory(Category category)
+        public async Task<ActionResult> AddCategory(Category category)
         {
             IDbDataProvider dataProvider = new CategoryDbDataProvider();
-            DataBaseResult result = dataProvider.AddData(category);
+            DataBaseResult result = await dataProvider.AddData(category);
 
             if (result.Success != null)
             {
@@ -51,10 +53,10 @@ namespace TaskList.Controllers
             }
         }
 
-        public ActionResult GetTasks(int categoryId)
+        public async Task<ActionResult> GetTasks(int categoryId)
         {
             IDbDataProvider provider = new TaskDbDataProvider();
-            DataBaseResult result = provider.GetTasksByCategory(categoryId);
+            DataBaseResult result = await provider.GetTasksByCategory(categoryId);
 
             if (result.Success != null)
             {
@@ -69,15 +71,15 @@ namespace TaskList.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddTask(Task newTask)
+        public async Task<ActionResult> AddTask(Task newTask)
         {
             if (newTask.CategoryId == 0)
             {
-                return Index();
+                return Index().Result;
             }
 
             IDbDataProvider provider = new TaskDbDataProvider();
-            DataBaseResult result = provider.AddData(newTask);
+            DataBaseResult result = await provider.AddData(newTask);
 
             if (result.Success != null)
             {
@@ -93,10 +95,10 @@ namespace TaskList.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddSubTask(SubTask subtask)
+        public async Task<ActionResult> AddSubTask(SubTask subtask)
         {
             IDbDataProvider provider = new SubtaskDbDataProvider();
-            DataBaseResult result = provider.AddData(subtask);
+            DataBaseResult result = await provider.AddData(subtask);
 
             if (result.Success != null)
             {
@@ -113,11 +115,11 @@ namespace TaskList.Controllers
         }
 
         [HttpPost]
-        public void SaveTasks(List<TaskSaveViewModel> saveData)
+        public async Task<ActionResult> SaveTasks(List<TaskSaveViewModel> saveData)
         {
             if (saveData == null)
             {
-                return;
+                return new EmptyResult();
             }
 
             var tasks = saveData.Where(d => d.TaskType == 0);
@@ -126,20 +128,22 @@ namespace TaskList.Controllers
             IDbDataProvider taskProvider = new TaskDbDataProvider();
             foreach (TaskSaveViewModel task in tasks)
             {
-                taskProvider.UpdateData(task.Id,
+                 await taskProvider.UpdateData(task.Id,
                     new TaskParams {IsFinished = task.IsFinished, UpdateFinishedOnly = true});
             }
 
             IDbDataProvider subtaskProvider = new SubtaskDbDataProvider();
             foreach (TaskSaveViewModel subtask in subtasks)
             {
-                subtaskProvider.UpdateData(subtask.Id,
+                 await subtaskProvider.UpdateData(subtask.Id,
                     new TaskParams {IsFinished = subtask.IsFinished, UpdateFinishedOnly = true});
             }
+
+            return Json("", JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public ActionResult DeleteTasks(List<TaskSaveViewModel> deleteData)
+        public async Task<ActionResult> DeleteTasks(List<TaskSaveViewModel> deleteData)
         {
             if (deleteData == null)
             {
@@ -152,13 +156,13 @@ namespace TaskList.Controllers
             IDbDataProvider taskProvider = new TaskDbDataProvider();
             foreach (TaskSaveViewModel task in tasks)
             {
-                taskProvider.DeleteData(task.Id);
+                await taskProvider.DeleteData(task.Id);
             }
 
             IDbDataProvider subtaskProvider = new SubtaskDbDataProvider();
             foreach (TaskSaveViewModel subtask in subtasks)
             {
-                subtaskProvider.DeleteData(subtask.Id);
+                await subtaskProvider.DeleteData(subtask.Id);
             }
 
             return Json("Ok", JsonRequestBehavior.AllowGet);
