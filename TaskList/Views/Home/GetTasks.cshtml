@@ -1,0 +1,26 @@
+﻿@model IEnumerable<TaskList.Models.DataBase.Entities.Task>
+
+<h2>Task list</h2>
+<ul id="taskList">
+    @foreach (var task in Model)
+    {
+        Html.RenderPartial("Task", task);
+
+//        if (task.SubTasks.Count != 0)
+//        {
+@*            <ul id="@task.TaskId">*@
+@*                @foreach (var sub in task.SubTasks)*@
+@*                {*@
+@*                    <li>*@
+@*                        <input type="checkbox" />*@
+@*                        @task.Text*@
+@*                    </li>*@
+@*                }*@
+@*            </ul>*@
+//        }
+    }
+</ul>
+
+<br/>
+<button class="btn btn-success" onclick="onSaveClick()">Save</button>
+<button class="btn btn-danger" onclick="onDeleteClicked()">Delete Finished</button>

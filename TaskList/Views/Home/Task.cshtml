@@ -1,0 +1,21 @@
+﻿@model TaskList.Models.DataBase.Entities.Task
+<li>
+    <input type="checkbox" @(Model.IsFinished ? "checked" : "") value="@Model.TaskId" data-type="0" />
+    @Model.Text (@Model.Date.ToShortDateString())
+    @using (Ajax.BeginForm("AddSubTask", new { TaskId = Model.TaskId }, new AjaxOptions { OnSuccess = "addSubTask" }))
+    {
+        <input type="text" name="Text" required=""/>
+        <button class="btn btn-primary">Add SubTask</button>
+    }
+    <ul id="@Model.TaskId">
+        @foreach (var sub in Model.SubTasks)
+        {
+            <li>
+                <input type="checkbox" @(sub.IsFinished ? "checked" : "") value="@sub.SubTaskId" data-type="1"/>
+                @sub.Text
+            </li>
+        }
+    </ul>
+
+</li>
+

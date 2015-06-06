@@ -1,0 +1,68 @@
+﻿@using TaskList.Models.DataBase.Entities
+@model IEnumerable<Category>
+
+@{
+    Layout = null;
+    List<SelectListItem> list = new List<SelectListItem>();
+    foreach (Category category in Model)
+    {
+        list.Add(new SelectListItem{Text = category.Name, Value = category.CategoryId.ToString()});
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css"/>
+</head>
+<body>
+
+<div class="container">
+    <div id="taskListContainer" class="col-md-6">
+    </div>
+
+    <div class="col-md-6">
+        <h2>Add new category</h2>
+        <div>
+            @using (Ajax.BeginForm("AddCategory", new AjaxOptions {OnSuccess = "categorySuccess"}))
+            {
+                @Html.TextBox("Name")
+                <button class="btn btn-default" type="submit">Add Category</button>
+            }
+        </div>
+
+        <h2>Add new task</h2>
+        <div>
+            @using (Ajax.BeginForm("AddTask", new AjaxOptions {OnSuccess = "addTask"}))
+            {
+                <div class="form-group">
+                    <label for="CategoryId">Category</label>
+                    @Html.DropDownList("CategoryId", list, "Select an item", new {@class = "form-control"})
+                </div>
+
+                <div class="form-group">
+                    <label for="Text">Text</label>
+                    @Html.TextBox("Text", "", new {@class = "form-control", required = ""})
+                </div>
+
+                <div class="form-group">
+                    <label for="Date">Date</label>
+                    <input class="form-control" name="Date" type="date" required=""/>
+                </div>
+
+                <button class="btn btn-primary" type="submit">Add task</button>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/MyScripts/TaskListScripts.js"></script>
+
+</body>
+</html>
